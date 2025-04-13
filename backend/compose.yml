@@ -1,0 +1,10 @@
+services:
+  db:
+    container_name: games-db
+    image: postgres:17
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: games
+      POSTGRES_PASSWORD: games
+      POSTGRES_DB: games

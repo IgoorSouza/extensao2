@@ -11,14 +11,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/games")
 @RequiredArgsConstructor
-@CrossOrigin(origins = { "http://localhost:5173", "http://localhost:4173" })
+@CrossOrigin(origins = "${FRONTEND_URL}")
 public class GamesController {
 
-    private final SteamService gamesService;
+    private final SteamService steamService;
 
     @GetMapping
     public ResponseEntity<List<SteamGameDetails>> getGames(@RequestParam String gameName) {
-        List<SteamGameDetails> games = gamesService.getGames(gameName);
+        List<SteamGameDetails> games = steamService.getGames(gameName);
         return ResponseEntity.ok(games);
     }
 }

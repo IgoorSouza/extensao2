@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: games
+  jpa:
+    hibernate:
+      ddl-auto: update
+    generate-ddl: true
+    database: postgresql
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/games
+    username: games
+    password: games
+
+server:
+  port: 8080
