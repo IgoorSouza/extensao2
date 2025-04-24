@@ -1,4 +1,4 @@
-package com.igorsouza.games.dtos.auth;
+package com.igorsouza.games.dtos.games.epic;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Login {
-    private String email;
-    private String password;
+public class EpicGamesStoreGameCategory {
+    private String path;
 }

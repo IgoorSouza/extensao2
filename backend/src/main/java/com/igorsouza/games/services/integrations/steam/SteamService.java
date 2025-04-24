@@ -1,4 +1,4 @@
-package com.igorsouza.games.services.games.steam;
+package com.igorsouza.games.services.integrations.steam;
 
 import com.igorsouza.games.dtos.games.steam.SteamGameDetails;
 

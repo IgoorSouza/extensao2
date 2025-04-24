@@ -8,7 +8,6 @@ import com.igorsouza.games.exceptions.users.UserAlreadyExistsException;
 import com.igorsouza.games.exceptions.users.UserNotFoundException;
 
 public interface AuthService {
-
     void register(NewUser newUser) throws UserAlreadyExistsException;
     LoginResponse login(Login login) throws UserNotFoundException, WrongPasswordException;
 }

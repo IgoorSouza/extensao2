@@ -10,8 +10,6 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class SteamGameSearchResponse {
-
     private int total;
-
     private List<SteamGame> items;
 }

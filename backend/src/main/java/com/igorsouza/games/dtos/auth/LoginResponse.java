@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class LoginResponse {
-
     private String name;
     private String email;
     private String token;

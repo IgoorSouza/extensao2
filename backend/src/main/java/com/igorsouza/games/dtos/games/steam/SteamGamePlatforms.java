@@ -8,10 +8,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class SteamGamePlatforms {
-
     private boolean windows;
-
     private boolean mac;
-
     private boolean linux;
 }

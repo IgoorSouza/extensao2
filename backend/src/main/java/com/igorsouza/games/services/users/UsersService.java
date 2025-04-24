@@ -6,7 +6,6 @@ import com.igorsouza.games.exceptions.users.UserNotFoundException;
 import com.igorsouza.games.models.User;
 
 public interface UsersService {
-
     void createUser(NewUser newUser) throws UserAlreadyExistsException;
     User getUserByEmail(String email) throws UserNotFoundException;
 }

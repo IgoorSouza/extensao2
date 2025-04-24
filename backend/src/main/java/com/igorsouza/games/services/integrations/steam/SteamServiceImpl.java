@@ -1,4 +1,4 @@
-package com.igorsouza.games.services.games.steam;
+package com.igorsouza.games.services.integrations.steam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.igorsouza.games.dtos.games.steam.SteamGame;
@@ -19,25 +19,23 @@ public class SteamServiceImpl implements SteamService {
 
     @Override
     public List<SteamGameDetails> getGames(String gameName) {
-        List<SteamGame> games = getGamesByName(gameName);
-
-        return games.stream().map(game ->
-                getGameDetails(String.valueOf(game.getId()))).toList();
+        List<Integer> gamesIds = getGamesIdsByName(gameName);
+        return gamesIds.stream().map(this::getGameDetails).toList();
     }
 
-    private List<SteamGame> getGamesByName(String gameName) {
+    private List<Integer> getGamesIdsByName(String gameName) {
         RestTemplate restTemplate = new RestTemplate();
         String url = "https://store.steampowered.com/api/storesearch?cc=br&l=portuguese&term=" + gameName;
         SteamGameSearchResponse response = restTemplate.getForObject(url, SteamGameSearchResponse.class);
 
-        return response.getItems();
+        return response.getItems().stream().map(SteamGame::getId).toList();
     }
 
-    private SteamGameDetails getGameDetails(String gameId) {
+    private SteamGameDetails getGameDetails(Integer gameId) {
         String url = "https://store.steampowered.com/api/appdetails?cc=br&l=portuguese&appids=" + gameId;
         RestTemplate restTemplate = new RestTemplate();
         Map<String, Object> gameDetailsResponse = restTemplate.getForObject(url, Map.class);
-        Map<String, Object> gameDetailsWrapper = (Map<String, Object>) gameDetailsResponse.get(gameId);
+        Map<String, Object> gameDetailsWrapper = (Map<String, Object>) gameDetailsResponse.get(String.valueOf(gameId));
         SteamGameDetails gameDetails = objectMapper.convertValue(gameDetailsWrapper.get("data"), SteamGameDetails.class);
 
         gameDetails.setUrl("https://store.steampowered.com/app/" + gameId);
