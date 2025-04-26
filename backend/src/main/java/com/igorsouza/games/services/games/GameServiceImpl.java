@@ -34,14 +34,17 @@ public class GameServiceImpl implements GameService {
     private List<Game> formatSteamGames(List<SteamGameDetails> games) {
         return games.stream().map(game -> {
             SteamGamePriceOverview gamePrice = game.getPriceOverview();
+            double initialPrice = gamePrice == null ? 0 : (double) gamePrice.getInitialPrice() / 100;
+            double discountPrice = gamePrice == null ? 0 : (double) gamePrice.getFinalPrice() / 100;
+            int discountPercent = gamePrice == null ? 0 : gamePrice.getDiscountPercent();
 
             return new Game(
                     game.getName(),
                     game.getUrl(),
                     game.getHeaderImage(),
-                     (double) gamePrice.getInitialPrice() / 100,
-                    (double) gamePrice.getFinalPrice() / 100,
-                    gamePrice.getDiscountPercent()
+                     initialPrice,
+                    discountPrice,
+                    discountPercent
             );
         }).toList();
     }

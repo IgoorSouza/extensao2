@@ -6,8 +6,8 @@ spring:
       ddl-auto: update
     generate-ddl: true
     database: postgresql
+    open-in-view: false
   datasource:
-    driver-class-name: org.postgresql.Driver
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
