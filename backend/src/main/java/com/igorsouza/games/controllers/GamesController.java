@@ -11,7 +11,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/games")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "${FRONTEND_URL}")
+@CrossOrigin(origins = "*")
 public class GamesController {
 
     private final GameService gameService;
