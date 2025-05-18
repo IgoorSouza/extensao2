@@ -1,24 +1,24 @@
 package com.igorsouza.games.services.games;
 
 import com.igorsouza.games.dtos.games.GenericGame;
-import com.igorsouza.games.dtos.games.WishlistGame;
 import com.igorsouza.games.dtos.games.epic.*;
 import com.igorsouza.games.dtos.games.steam.SteamGameDetails;
 import com.igorsouza.games.dtos.games.steam.SteamGamePriceOverview;
 import com.igorsouza.games.enums.GamePlatform;
-import com.igorsouza.games.exceptions.games.GameAlreadyWishlistedException;
+import com.igorsouza.games.exceptions.ConflictException;
+import com.igorsouza.games.exceptions.NotFoundException;
 import com.igorsouza.games.models.Game;
+import com.igorsouza.games.models.GameId;
 import com.igorsouza.games.models.User;
 import com.igorsouza.games.repositories.GamesRepository;
 import com.igorsouza.games.services.integrations.epic.EpicGamesStoreService;
 import com.igorsouza.games.services.integrations.steam.SteamService;
-import com.igorsouza.games.services.users.UsersService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +26,6 @@ public class GameServiceImpl implements GameService {
 
     private final SteamService steamService;
     private final EpicGamesStoreService epicGamesStoreService;
-    private final UsersService usersService;
     private final GamesRepository gamesRepository;
 
     @Override
@@ -55,40 +54,31 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public List<Game> getGamesByUserId(UUID id) {
-        return gamesRepository.findAllByUserId(id);
+    public List<Game> getGamesByUser(User user) {
+        return gamesRepository.findAllByUser(user);
     }
 
     @Override
-    public List<GenericGame> getAuthenticatedUserGames() {
-        UUID authenticatedUserId = usersService.getAuthenticatedUserId();
-        List<Game> userGames = getGamesByUserId(authenticatedUserId);
+    public void saveGame(Game game) throws ConflictException {
+        GameId gameId = new GameId(game.getUserId(), game.getPlatformIdentifier(), game.getPlatform());
 
-        return userGames.stream().map(game -> {
-            if (game.getPlatform() == GamePlatform.STEAM) {
-                SteamGameDetails steamGame = steamService.getGameDetails(Integer.parseInt(game.getPlatformIdentifier()));
-                return formatSteamGame(steamGame);
-            }
-
-            EpicGamesStoreGame epicGame = epicGamesStoreService.getGameDetails(game.getPlatformIdentifier());
-            return formatEpicStoreGame(epicGame);
-        }).toList();
-    }
-
-    @Override
-    public void addGame(WishlistGame wishlistGame) throws GameAlreadyWishlistedException {
-        try {
-            User authenticatedUser = usersService.getAuthenticatedUser().get();
-            Game game = Game.builder()
-                    .platformIdentifier(wishlistGame.getPlatformIdentifier())
-                    .platform(wishlistGame.getPlatform())
-                    .user(authenticatedUser)
-                    .build();
-
-            gamesRepository.save(game);
-        } catch (DataIntegrityViolationException e) {
-            throw new GameAlreadyWishlistedException("You have already added this game to your wishlist.");
+        if (gamesRepository.existsById(gameId)) {
+            throw new ConflictException("You have already added this game to your wishlist.");
         }
+
+        gamesRepository.save(game);
+    }
+
+    @Override
+    public void removeGame(Game game) throws NotFoundException {
+        GameId gameId = new GameId(game.getUserId(), game.getPlatformIdentifier(), game.getPlatform());
+        boolean gameExists = gamesRepository.existsById(gameId);
+
+        if (!gameExists) {
+            throw new NotFoundException("Game not found.");
+        }
+
+        gamesRepository.deleteById(gameId);
     }
 
     private GenericGame formatSteamGame(SteamGameDetails game) {

@@ -1,8 +1,8 @@
 package com.igorsouza.games.services.users;
 
 import com.igorsouza.games.dtos.auth.NewUser;
-import com.igorsouza.games.exceptions.users.UserAlreadyExistsException;
-import com.igorsouza.games.exceptions.users.UserNotFoundException;
+import com.igorsouza.games.exceptions.ConflictException;
+import com.igorsouza.games.exceptions.UnauthorizedException;
 import com.igorsouza.games.models.User;
 import com.igorsouza.games.repositories.UsersRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +31,9 @@ public class UsersServiceImpl implements UsersService, UserDetailsService {
     }
 
     @Override
-    public User getUserByEmail(String email) throws UserNotFoundException {
+    public User getUserByEmail(String email) throws UsernameNotFoundException {
         return usersRepository.findByEmail(email).orElseThrow(() ->
-                new UserNotFoundException("User not found."));
+                new UsernameNotFoundException("User not found."));
     }
 
     @Override
@@ -48,12 +48,18 @@ public class UsersServiceImpl implements UsersService, UserDetailsService {
     }
 
     @Override
-    public Optional<User> getAuthenticatedUser() {
-        return usersRepository.findById(getAuthenticatedUserId());
+    public User getAuthenticatedUser() throws UnauthorizedException {
+        Optional<User> user = usersRepository.findById(getAuthenticatedUserId());
+
+        if (user.isEmpty()) {
+            throw new UnauthorizedException("User is not authenticated.");
+        }
+
+        return user.get();
     }
 
     @Override
-    public void createUser(NewUser newUser) throws UserAlreadyExistsException {
+    public void createUser(NewUser newUser) throws ConflictException {
         try {
             User user = User.builder()
                     .name(newUser.getName())
@@ -63,7 +69,7 @@ public class UsersServiceImpl implements UsersService, UserDetailsService {
 
             usersRepository.save(user);
         } catch (DataIntegrityViolationException e) {
-            throw new UserAlreadyExistsException("User already exists.");
+            throw new ConflictException("User already exists.");
         }
     }
 }

@@ -3,9 +3,9 @@ package com.igorsouza.games.controllers;
 import com.igorsouza.games.dtos.auth.Login;
 import com.igorsouza.games.dtos.auth.LoginResponse;
 import com.igorsouza.games.dtos.auth.NewUser;
-import com.igorsouza.games.exceptions.auth.WrongPasswordException;
-import com.igorsouza.games.exceptions.users.UserAlreadyExistsException;
-import com.igorsouza.games.exceptions.users.UserNotFoundException;
+import com.igorsouza.games.exceptions.BadRequestException;
+import com.igorsouza.games.exceptions.ConflictException;
+import com.igorsouza.games.exceptions.NotFoundException;
 import com.igorsouza.games.services.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -22,14 +22,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody NewUser newUser)
-            throws UserAlreadyExistsException {
+            throws ConflictException {
         authService.register(newUser);
         return ResponseEntity.status(HttpStatus.CREATED).body("User successfully registered.");
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody Login login)
-            throws UserNotFoundException, WrongPasswordException {
+            throws NotFoundException, BadRequestException {
         LoginResponse authData = authService.login(login);
         return ResponseEntity.ok(authData);
     }

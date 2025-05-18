@@ -10,23 +10,27 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @Entity
-@Table(name = "games", uniqueConstraints = { @UniqueConstraint(columnNames = { "user_id", "platform_identifier", "platform" }) })
+@Table(name = "games")
 public class Game {
 
-    @Id
-    @GeneratedValue(strategy = jakarta.persistence.GenerationType.UUID)
-    private UUID id;
-
-    @Column(name = "platform_identifier", nullable = false)
-    private String platformIdentifier;
-
-    @Column(name = "platform", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private GamePlatform platform;
+    @EmbeddedId
+    private GameId id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("userId")
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public String getPlatformIdentifier() {
+        return id.getPlatformIdentifier();
+    }
+
+    public GamePlatform getPlatform() {
+        return id.getPlatform();
+    }
+
+    public UUID getUserId() {
+        return user.getId();
+    }
 }

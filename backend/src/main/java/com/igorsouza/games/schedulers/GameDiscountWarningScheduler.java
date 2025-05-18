@@ -27,7 +27,7 @@ public class GameDiscountWarningScheduler {
         List<User> users = usersService.getAllUsers();
 
         for (User user : users) {
-            List<Game> userGames = gameService.getGamesByUserId(user.getId());
+            List<Game> userGames = gameService.getGamesByUser(user);
             List<GenericGame> gamesWithDiscount = new ArrayList<>();
 
             for (Game game : userGames) {

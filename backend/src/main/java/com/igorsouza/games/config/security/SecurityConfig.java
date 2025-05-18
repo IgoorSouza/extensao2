@@ -23,8 +23,7 @@ public class SecurityConfig {
 
     private static final String[] AUTH_WHITELIST = {
             "/auth/**",
-            "/games/steam",
-            "/games/epic"
+            "/games/**",
     };
 
     @Bean
