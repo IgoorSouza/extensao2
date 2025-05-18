@@ -1,6 +1,8 @@
 import { FormEvent, useState } from "react";
 import axios from "../lib/axios";
 import { Game } from "../types/game";
+import toast from "react-hot-toast";
+import { useAuth } from "../hooks/use-auth";
 import formatGamePrice from "../utils/format-game-price";
 
 export default function Games() {
@@ -11,16 +13,64 @@ export default function Games() {
   const [searchedGameStore, setSearchedGameStore] = useState<
     "Steam" | "Epic Games Store"
   >("Steam");
+  const { authData } = useAuth();
 
   async function getGames(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (search.trim() === "") return;
+    try {
+      event.preventDefault();
+      if (search.trim() === "") return;
 
-    setLoading(true);
-    const response = await axios.get(`/games/${gameStore}?gameName=${search}`);
-    setGames(response.data);
-    setSearchedGameStore(gameStore === "steam" ? "Steam" : "Epic Games Store");
-    setLoading(false);
+      setLoading(true);
+
+      const response = await axios.get(
+        `/games/${gameStore}?gameName=${search}`
+      );
+
+      setGames(response.data);
+      setSearchedGameStore(
+        gameStore === "steam" ? "Steam" : "Epic Games Store"
+      );
+      setLoading(false);
+    } catch (error) {
+      console.error(error);
+
+      setLoading(false);
+      toast.error("Ocorreu um erro ao buscar os jogos.");
+    }
+  }
+
+  async function addGameToWishlist(game: Game) {
+    try {
+      if (!authData) {
+        toast.error(
+          "Você deve estar autenticado(a) para adicionar jogos à sua lista de desejos."
+        );
+        return;
+      }
+
+      setLoading(true);
+
+      const headers = {
+        Authorization: `Bearer ${authData.token}`,
+        "Content-Type": "application/json",
+      };
+
+      const body = {
+        platformIdentifier: game.identifier,
+        platform: searchedGameStore === "Steam" ? "STEAM" : "EPIC",
+      };
+
+      await axios.post("/games/wishlist", body, { headers });
+      toast.success(`${game.title} foi adicionado à sua lista de desejos!`);
+    } catch (error) {
+      console.error(error);
+
+      toast.error(
+        `Ocorreu um erro ao adicionar ${game.title} à sua lista de desejos.`
+      );
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -54,7 +104,7 @@ export default function Games() {
 
         <button
           disabled={loading}
-          className={`px-3 py-2 rounded-md bg-white text-black ${
+          className={`px-3 py-2 rounded-md bg-white text-black font-semibold ${
             loading ? "opacity-30" : "cursor-pointer hover:bg-gray-300"
           }`}
         >
@@ -62,63 +112,95 @@ export default function Games() {
         </button>
       </form>
 
+      <div className="text-center my-6">
+        {searchedGameStore === "Epic Games Store" && (
+          <p>
+            ⚠️ Nota: Alguns links para jogos da{" "}
+            <strong>Epic Games Store</strong> podem não funcionar corretamente.
+          </p>
+        )}
+      </div>
+
       <div className="flex flex-col gap-y-5 items-center">
-        <div className="text-center max-w-1/2">
-          {games && (
-            <h1 className="text-2xl mt-8 mb-2">
-              {games.length > 0 ? "Resultados" : `Sem resultados.`}
-            </h1>
-          )}
+        {games?.length === 0 ? (
+          <p className="text-white text-2xl">
+            {search} não foi encontrado na {searchedGameStore}.
+          </p>
+        ) : (
+          games?.map((game) => {
+            const gameInitialPrice = formatGamePrice(game.initialPrice);
+            const gameDiscountPrice = formatGamePrice(game.discountPrice);
 
-          {searchedGameStore === "Epic Games Store" && (
-            <p>
-              Observação: devido a problemas com a API da Epic Games, os links
-              para os jogos na Epic Games Store podem estar incorretos.{" "}
-            </p>
-          )}
-        </div>
+            return (
+              <div
+                key={game.identifier}
+                className="w-full max-w-md bg-[#1f2937] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300"
+              >
+                <img
+                  src={game.image}
+                  alt={game.title}
+                  className="w-full h-48 object-cover"
+                />
 
-        {games?.map((game) => {
-          const gameInitialPrice = formatGamePrice(game.initialPrice);
-          const gameDiscountPrice = formatGamePrice(game.discountPrice);
+                <div className="p-5 flex flex-col gap-2 text-center">
+                  <h2 className="text-white font-semibold text-xl">
+                    {game.title}
+                  </h2>
 
-          return (
-            <div
-              className="flex justify-between items-center px-4 py-6 bg-gray-800 w-full max-w-[640px]"
-              key={game.title}
-            >
-              <img src={game.image} alt="Game Image" className="w-[300px]" />
-
-              <div className="flex flex-col items-center justify-center ml-5 text-center w-full max-w-[300px]">
-                <h2 className="text-xl mb-2 font-bold">{game.title}</h2>
-
-                <div className="flex flex-col">
-                  {game.discountPrice > 0 ? (
+                  {game.initialPrice === 0 ? (
+                    <p className="text-green-400 font-semibold">Gratuito</p>
+                  ) : (
                     <>
-                      <p>Preço Original: R$ {gameInitialPrice}</p>
-                      <p>Preço Atual: R$ {gameDiscountPrice}</p>
+                      <p className="text-green-400 font-bold">
+                        Preço Atual: R$ {gameDiscountPrice}
+                      </p>
 
-                      {game.discountPercent > 0 && (
-                        <p>Desconto: {game.discountPercent}%</p>
+                      {game.initialPrice > game.discountPrice && (
+                        <>
+                          <p className="text-gray-400 text-md">
+                            Preço Original:{" "}
+                            <span className="line-through">
+                              R$ {gameInitialPrice}
+                            </span>
+                          </p>
+
+                          {game.discountPercent > 0 && (
+                            <span className="bg-yellow-500 text-black text-md font-semibold px-3 py-1 rounded-full mt-1">
+                              {game.discountPercent}% de desconto!
+                            </span>
+                          )}
+                        </>
                       )}
                     </>
-                  ) : (
-                    <p>Gratuito</p>
+                  )}
+
+                  <a
+                    href={game.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 inline-block text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-300"
+                  >
+                    Acessar na {searchedGameStore}
+                  </a>
+
+                  {game.initialPrice > 0 && (
+                    <button
+                      disabled={loading}
+                      onClick={() => addGameToWishlist(game)}
+                      className={`mt-2 inline-block text-sm bg-cyan-500 text-white px-4 py-2 rounded-lg transition duration-300 ${
+                        loading
+                          ? "bg-cyan-600"
+                          : "hover:bg-cyan-600 cursor-pointer"
+                      }`}
+                    >
+                      Adicionar à lista de desejos
+                    </button>
                   )}
                 </div>
-
-                <a
-                  href={game.url}
-                  target="_blank"
-                  rel="external"
-                  className="mt-2 break-words text-blue-500 max-w-[80%]"
-                >
-                  Clique aqui para acessar o jogo na {searchedGameStore}
-                </a>
               </div>
-            </div>
-          );
-        })}
+            );
+          })
+        )}
       </div>
     </div>
   );

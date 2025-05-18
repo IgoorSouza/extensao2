@@ -23,22 +23,23 @@ public class SteamServiceImpl implements SteamService {
         return gamesIds.stream().map(this::getGameDetails).toList();
     }
 
-    private List<Integer> getGamesIdsByName(String gameName) {
-        RestTemplate restTemplate = new RestTemplate();
-        String url = "https://store.steampowered.com/api/storesearch?cc=br&l=portuguese&term=" + gameName;
-        SteamGameSearchResponse response = restTemplate.getForObject(url, SteamGameSearchResponse.class);
-
-        return response.getItems().stream().map(SteamGame::getId).toList();
-    }
-
-    private SteamGameDetails getGameDetails(Integer gameId) {
+    public SteamGameDetails getGameDetails(Integer gameId) {
         String url = "https://store.steampowered.com/api/appdetails?cc=br&l=portuguese&appids=" + gameId;
         RestTemplate restTemplate = new RestTemplate();
         Map<String, Object> gameDetailsResponse = restTemplate.getForObject(url, Map.class);
         Map<String, Object> gameDetailsWrapper = (Map<String, Object>) gameDetailsResponse.get(String.valueOf(gameId));
         SteamGameDetails gameDetails = objectMapper.convertValue(gameDetailsWrapper.get("data"), SteamGameDetails.class);
 
+        gameDetails.setIdentifier(String.valueOf(gameId));
         gameDetails.setUrl("https://store.steampowered.com/app/" + gameId);
         return gameDetails;
+    }
+
+    private List<Integer> getGamesIdsByName(String gameName) {
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "https://store.steampowered.com/api/storesearch?cc=br&l=portuguese&term=" + gameName;
+        SteamGameSearchResponse response = restTemplate.getForObject(url, SteamGameSearchResponse.class);
+
+        return response.getItems().stream().map(SteamGame::getId).toList();
     }
 }

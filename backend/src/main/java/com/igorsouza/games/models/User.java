@@ -31,6 +31,9 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Game> games;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

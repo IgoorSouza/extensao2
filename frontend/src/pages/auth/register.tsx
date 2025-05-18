@@ -33,6 +33,7 @@ export default function Register() {
   return (
     <AuthForm
       onSubmit={createAccount}
+      text="Crie uma conta para usar a lista de desejos e receber notificações de promoções e descontos de jogos de seu interesse em seu email!"
       buttonText="Criar"
       linkText="Entrar"
       linkRoute="/auth/login"

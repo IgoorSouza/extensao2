@@ -10,6 +10,8 @@ import lombok.Setter;
 @NoArgsConstructor
 public class SteamGameDetails {
 
+    private String identifier;
+
     private String name;
 
     @JsonProperty("is_free")

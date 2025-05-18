@@ -23,15 +23,17 @@ public class SecurityFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
 
     private static final String[] AUTH_WHITELIST = {
-            "/auth",
-            "/games"
+            "/auth/register",
+            "/auth/login",
+            "/games/steam",
+            "/games/epic"
     };
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         for (String path : AUTH_WHITELIST) {
-            if (request.getRequestURI().contains(path)) {
+            if (request.getRequestURI().equals(path)) {
                 filterChain.doFilter(request, response);
                 return;
             }

@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface EpicGamesStoreService {
     List<EpicGamesStoreGame> getGames(String gameName);
+    EpicGamesStoreGame getGameDetails(String identifier);
 }

@@ -22,6 +22,17 @@ public class EpicGamesStoreServiceImpl implements EpicGamesStoreService {
         return response.getBody().getData().getCatalog().getSearchStore().getElements();
     }
 
+    @Override
+    public EpicGamesStoreGame getGameDetails(String identifier) {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<EpicGamesStoreGameSearchResponse> response = restTemplate.postForEntity(
+                "https://graphql.epicgames.com/graphql",
+                getGraphQLRequest(identifier),
+                EpicGamesStoreGameSearchResponse.class);
+
+        return response.getBody().getData().getCatalog().getSearchStore().getElements().getFirst();
+    }
+
     private Map<String, Object> getGraphQLRequest(String gameName) {
         String query = """
             query searchStoreQuery($keyword: String, $locale: String!, $country: String!) {

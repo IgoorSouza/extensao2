@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface SteamService {
     List<SteamGameDetails> getGames(String gameName);
+    SteamGameDetails getGameDetails(Integer gameId);
 }

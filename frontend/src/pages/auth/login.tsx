@@ -39,6 +39,7 @@ export default function Login() {
   return (
     <AuthForm
       onSubmit={handleLogin}
+      text="Faça login para usar a lista de desejos e receber notificações de promoções e descontos de jogos de seu interesse em seu email!"
       buttonText="Entrar"
       linkText="Criar conta"
       linkRoute="/auth/register"
