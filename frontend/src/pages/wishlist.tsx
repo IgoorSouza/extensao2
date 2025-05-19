@@ -14,7 +14,7 @@ export default function Wishlist() {
     async function getGames() {
       try {
         const headers = { Authorization: `Bearer ${authData?.token}` };
-        const response = await axios.get(`/games/wishlist`, { headers });
+        const response = await axios.get(`/wishlist`, { headers });
         setGames(response.data);
       } catch (error) {
         console.error(error);

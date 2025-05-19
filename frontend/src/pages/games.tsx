@@ -60,7 +60,7 @@ export default function Games() {
         platform: searchedGameStore === "Steam" ? "STEAM" : "EPIC",
       };
 
-      await axios.post("/games/wishlist", body, { headers });
+      await axios.post("/wishlist", body, { headers });
       toast.success(`${game.title} foi adicionado à sua lista de desejos!`);
     } catch (error) {
       console.error(error);
