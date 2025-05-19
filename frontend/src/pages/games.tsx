@@ -3,7 +3,8 @@ import axios from "../lib/axios";
 import { Game } from "../types/game";
 import toast from "react-hot-toast";
 import { useAuth } from "../hooks/use-auth";
-import formatGamePrice from "../utils/format-game-price";
+import GameCard from "../components/game-card";
+import { AxiosError } from "axios";
 
 export default function Games() {
   const [games, setGames] = useState<Game[]>();
@@ -20,6 +21,9 @@ export default function Games() {
       event.preventDefault();
       if (search.trim() === "") return;
 
+      setSearchedGameStore(
+        gameStore === "steam" ? "Steam" : "Epic Games Store"
+      );
       setLoading(true);
 
       const response = await axios.get(
@@ -27,15 +31,15 @@ export default function Games() {
       );
 
       setGames(response.data);
-      setSearchedGameStore(
-        gameStore === "steam" ? "Steam" : "Epic Games Store"
-      );
-      setLoading(false);
     } catch (error) {
       console.error(error);
-
+      toast.error(
+        `Ocorreu um erro ao buscar os jogos da ${
+          gameStore === "steam" ? "Steam" : "Epic Games Store"
+        }.`
+      );
+    } finally {
       setLoading(false);
-      toast.error("Ocorreu um erro ao buscar os jogos.");
     }
   }
 
@@ -57,14 +61,18 @@ export default function Games() {
 
       const body = {
         platformIdentifier: game.identifier,
-        platform: searchedGameStore === "Steam" ? "STEAM" : "EPIC",
+        platform: gameStore.toUpperCase(),
       };
 
       await axios.post("/wishlist", body, { headers });
       toast.success(`${game.title} foi adicionado à sua lista de desejos!`);
     } catch (error) {
-      console.error(error);
+      if (error instanceof AxiosError && error.status === 409) {
+        toast.error(`${game.title} já está na sua lista de desejos.`);
+        return;
+      }
 
+      console.error(error);
       toast.error(
         `Ocorreu um erro ao adicionar ${game.title} à sua lista de desejos.`
       );
@@ -127,79 +135,15 @@ export default function Games() {
             {search} não foi encontrado na {searchedGameStore}.
           </p>
         ) : (
-          games?.map((game) => {
-            const gameInitialPrice = formatGamePrice(game.initialPrice);
-            const gameDiscountPrice = formatGamePrice(game.discountPrice);
-
-            return (
-              <div
-                key={game.identifier}
-                className="w-full max-w-md bg-[#1f2937] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300"
-              >
-                <img
-                  src={game.image}
-                  alt={game.title}
-                  className="w-full h-48 object-cover"
-                />
-
-                <div className="p-5 flex flex-col gap-2 text-center">
-                  <h2 className="text-white font-semibold text-xl">
-                    {game.title}
-                  </h2>
-
-                  {game.initialPrice === 0 ? (
-                    <p className="text-green-400 font-semibold">Gratuito</p>
-                  ) : (
-                    <>
-                      <p className="text-green-400 font-bold">
-                        Preço Atual: R$ {gameDiscountPrice}
-                      </p>
-
-                      {game.initialPrice > game.discountPrice && (
-                        <>
-                          <p className="text-gray-400 text-md">
-                            Preço Original:{" "}
-                            <span className="line-through">
-                              R$ {gameInitialPrice}
-                            </span>
-                          </p>
-
-                          {game.discountPercent > 0 && (
-                            <span className="bg-yellow-500 text-black text-md font-semibold px-3 py-1 rounded-full mt-1">
-                              {game.discountPercent}% de desconto!
-                            </span>
-                          )}
-                        </>
-                      )}
-                    </>
-                  )}
-
-                  <a
-                    href={game.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 inline-block text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-300"
-                  >
-                    Acessar na {searchedGameStore}
-                  </a>
-
-                  {game.initialPrice > 0 && (
-                    <button
-                      disabled={loading}
-                      onClick={() => addGameToWishlist(game)}
-                      className={`mt-2 inline-block text-sm bg-cyan-500 text-white px-4 py-2 rounded-lg transition duration-300 ${
-                        loading
-                          ? "bg-cyan-600"
-                          : "hover:bg-cyan-600 cursor-pointer"
-                      }`}
-                    >
-                      Adicionar à lista de desejos
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })
+          games?.map((game) => (
+            <GameCard
+              game={game}
+              gameStore={searchedGameStore}
+              wishlistButtonText="Adicionar à lista de desejos"
+              wishlistButtonFunction={addGameToWishlist}
+              key={game.identifier}
+            />
+          ))
         )}
       </div>
     </div>

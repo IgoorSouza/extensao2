@@ -22,7 +22,7 @@ export default function Register() {
       navigate("/auth/login");
     } catch (error) {
       if (error instanceof AxiosError && error.status === 409) {
-        toast.error("O email informado já está em uso.");
+        toast.error(`O email ${email} já está em uso.`);
         return;
       }
 

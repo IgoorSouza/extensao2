@@ -7,15 +7,10 @@ export default function Navbar() {
   const navigate = useNavigate();
   const { authData, logout } = useAuth();
 
-  const pages = [
-    { path: "/", label: "Buscar Jogos" },
-    { path: "/auth/login", label: "Login" },
-    { path: "/auth/register", label: "Criar conta" },
-  ];
-
+  const pages = [{ path: "/", label: "Buscar Jogos" }];
   const protectedPages = [
-    { path: "/wishlist", label: "Lista de Desejos" },
     ...pages,
+    { path: "/wishlist", label: "Lista de Desejos" },
   ];
 
   function handleLogout() {
@@ -46,23 +41,32 @@ export default function Navbar() {
         ))}
       </ul>
 
-      {authData && (
-        <div className="flex items-center gap-x-3">
-          <img src={user} className="w-[40px]" />
+      <div className="flex items-center gap-x-3">
+        <img src={user} className="w-[40px]" />
 
-          <div className="text-right">
-            <p className="text-sm font-semibold">{authData.name}</p>
-            <p className="text-xs text-gray-300">{authData.email}</p>
-          </div>
+        {authData ? (
+          <>
+            <div className="text-right">
+              <p className="text-sm font-semibold">{authData.name}</p>
+              <p className="text-xs text-gray-300">{authData.email}</p>
+            </div>
 
-          <button
-            onClick={handleLogout}
+            <button
+              onClick={handleLogout}
+              className="bg-white text-black px-4 py-2 rounded-lg text-sm cursor-pointer font-semibold hover:bg-gray-300"
+            >
+              Logout
+            </button>
+          </>
+        ) : (
+          <Link
+            to="/auth/login"
             className="bg-white text-black px-4 py-2 rounded-lg text-sm cursor-pointer font-semibold hover:bg-gray-300"
           >
-            Logout
-          </button>
-        </div>
-      )}
+            Login
+          </Link>
+        )}
+      </div>
     </nav>
   );
 }
