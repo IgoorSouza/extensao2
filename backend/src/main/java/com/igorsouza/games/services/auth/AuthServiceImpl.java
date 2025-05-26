@@ -56,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String token = jwtService.generateToken(user.getId());
-        mailService.sendVerificationMail(user.getEmail(), "Email Address Verification", token);
+        mailService.sendVerificationMail(user.getEmail(), "Verificação de Endereço de Email", token);
     }
 
     @Override
