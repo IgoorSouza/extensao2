@@ -62,11 +62,19 @@ export default function Wishlist() {
           {games && games.length > 0 ? (
             <>
               {!authData?.emailVerified && (
-                <p className="text-white text-md">
+                <p className="text-white text-lg">
                   Verifique seu email para receber notificações de promoções dos
                   jogos da sua lista de desejos!
                 </p>
               )}
+
+              {authData?.emailVerified && !authData?.notificationsEnabled && (
+                <p className="text-white text-lg">
+                  Ative as notificações para receber promoções dos jogos da sua
+                  lista de desejos em seu email!
+                </p>
+              )}
+
               {games?.map((game) => (
                 <GameCard
                   game={game}

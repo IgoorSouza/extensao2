@@ -78,9 +78,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         User authenticatedUser = getAuthenticatedUser();
-        authenticatedUser.setName(user.getName());
-        authenticatedUser.setEmail(user.getEmail());
-
         boolean emailChanged = !authenticatedUser.getEmail().equals(user.getEmail());
 
         if (emailChanged) {
@@ -88,6 +85,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             authenticatedUser.setNotificationsEnabled(false);
         }
 
+        authenticatedUser.setName(user.getName());
+        authenticatedUser.setEmail(user.getEmail());
         userRepository.save(authenticatedUser);
     }
 

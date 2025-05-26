@@ -4,5 +4,5 @@ import { useAuth } from "../hooks/use-auth";
 
 export default function ProtectedRoute({ children }: PropsWithChildren) {
   const { authData } = useAuth();
-  return authData ? children : <Navigate to="/auth/login" replace />;
+  return authData ? children : <Navigate to="/" replace />;
 }

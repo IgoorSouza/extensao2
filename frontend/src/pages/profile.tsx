@@ -78,11 +78,15 @@ export default function Profile() {
       setNotificationsEnabled(!previousValue);
       setLoading(true);
 
-      await axios.put("/user/toggle-notifications", {
-        headers: {
-          Authorization: `Bearer ${authData?.token}`,
-        },
-      });
+      await axios.put(
+        "/user/toggle-notifications",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${authData!.token}`,
+          },
+        }
+      );
 
       updateAuthData({ ...authData!, notificationsEnabled: !previousValue });
       toast.success(
@@ -93,7 +97,11 @@ export default function Profile() {
     } catch (error) {
       console.error(error);
       setNotificationsEnabled(previousValue);
-      toast.error("Ocorreu um erro ao excluir sua conta.");
+      toast.error(
+        `Ocorreu um erro ao ${
+          previousValue ? "desativar" : "ativar"
+        } as notificações.`
+      );
     } finally {
       setLoading(false);
     }
