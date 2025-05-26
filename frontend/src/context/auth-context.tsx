@@ -5,6 +5,8 @@ interface AuthData {
   name: string;
   email: string;
   token: string;
+  emailVerified: boolean;
+  notificationsEnabled: boolean;
 }
 
 interface AuthContextType {
@@ -12,6 +14,7 @@ interface AuthContextType {
   register: (name: string, email: string, password: string) => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateAuthData: (newAuthData: AuthData) => void;
   loading: boolean;
 }
 
@@ -68,9 +71,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     localStorage.removeItem("authData");
   }
 
+  function updateAuthData(newAuthData: AuthData) {
+    setAuthData(newAuthData);
+    localStorage.setItem("authData", JSON.stringify(newAuthData));
+  }
+
   return (
     <AuthContext.Provider
-      value={{ authData, register, login, logout, loading }}
+      value={{ authData, register, login, logout, updateAuthData, loading }}
     >
       {children}
     </AuthContext.Provider>

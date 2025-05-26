@@ -54,17 +54,19 @@ export default function Games() {
 
       setLoading(true);
 
-      const headers = {
-        Authorization: `Bearer ${authData.token}`,
-        "Content-Type": "application/json",
-      };
+      await axios.post(
+        "/wishlist",
+        {
+          platformIdentifier: game.identifier,
+          platform: gameStore.toUpperCase(),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${authData.token}`,
+          },
+        }
+      );
 
-      const body = {
-        platformIdentifier: game.identifier,
-        platform: gameStore.toUpperCase(),
-      };
-
-      await axios.post("/wishlist", body, { headers });
       toast.success(`${game.title} foi adicionado à sua lista de desejos!`);
     } catch (error) {
       if (error instanceof AxiosError && error.status === 409) {
@@ -84,22 +86,20 @@ export default function Games() {
   return (
     <div className="text-white">
       <form
-        className="flex justify-center items-center mt-10 text-xl"
+        className="flex justify-center items-center mt-10 gap-x-4 text-lg"
         onSubmit={getGames}
       >
-        <label htmlFor="gameName">Nome do Jogo: </label>
         <input
           id="gameName"
           name="gameName"
-          className="border mx-3 p-2 rounded-md min-w-lg"
+          placeholder="Nome do jogo..."
+          className="border p-2 rounded-md min-w-lg"
           onChange={(event) => setSearch(event.target.value)}
         />
 
         <select
           disabled={loading}
-          className={`mx-4 border py-2 px-1 rounded-md ${
-            loading && "opacity-30"
-          }`}
+          className={`border py-2 px-1 rounded-md ${loading && "opacity-70"}`}
           onChange={(event) => setGameStore(event.target.value)}
         >
           <option value="steam" className="text-black">
@@ -112,8 +112,8 @@ export default function Games() {
 
         <button
           disabled={loading}
-          className={`px-3 py-2 rounded-md bg-white text-black font-semibold ${
-            loading ? "opacity-30" : "cursor-pointer hover:bg-gray-300"
+          className={`px-3 py-2 rounded-lg bg-white text-black font-semibold transition ${
+            loading ? "opacity-70" : "cursor-pointer hover:bg-gray-300"
           }`}
         >
           Pesquisar
@@ -129,7 +129,7 @@ export default function Games() {
         )}
       </div>
 
-      <div className="flex flex-col gap-y-5 items-center">
+      <div className="flex flex-col gap-y-5 items-center mb-5">
         {games?.length === 0 ? (
           <p className="text-white text-2xl">
             {search} não foi encontrado na {searchedGameStore}.

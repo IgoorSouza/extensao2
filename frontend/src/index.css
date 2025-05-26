@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+body {
+  @apply bg-fixed bg-gradient-to-b from-black to-zinc-800 min-h-screen;
+}

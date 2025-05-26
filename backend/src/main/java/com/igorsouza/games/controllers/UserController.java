@@ -1,0 +1,35 @@
+package com.igorsouza.games.controllers;
+
+import com.igorsouza.games.dtos.users.UpdateUser;
+import com.igorsouza.games.exceptions.ConflictException;
+import com.igorsouza.games.exceptions.UnauthorizedException;
+import com.igorsouza.games.services.users.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/user")
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+
+    @PutMapping
+    public ResponseEntity<String> updateUser(@RequestBody UpdateUser user) throws UnauthorizedException, ConflictException {
+        userService.updateAuthenticatedUser(user);
+        return ResponseEntity.ok("User successfully updated.");
+    }
+
+    @PutMapping("/toggle-notifications")
+    public ResponseEntity<String> toggleNotifications() throws UnauthorizedException {
+        boolean notificationsEnabled = userService.toggleNotifications();
+        return ResponseEntity.ok("Notifications successfully " + (notificationsEnabled ? "enabled" : "disabled") + ".");
+    }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteUser() throws UnauthorizedException {
+        userService.deleteAuthenticatedUser();
+        return ResponseEntity.ok("User successfully deleted.");
+    }
+}

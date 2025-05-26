@@ -31,6 +31,12 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    private boolean emailVerified = false;
+
+    @Column(nullable = false)
+    private boolean notificationsEnabled = false;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Game> games;
 

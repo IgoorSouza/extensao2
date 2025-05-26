@@ -5,8 +5,10 @@ import Login from "./pages/auth/login";
 import { Toaster } from "react-hot-toast";
 import { AuthProvider } from "./context/auth-context";
 import Wishlist from "./pages/wishlist";
-import Navbar from "./components/nav-bar";
 import ProtectedRoute from "./components/protected-route";
+import VerifyEmail from "./pages/auth/verify-email";
+import Navbar from "./components/nav-bar";
+import Profile from "./pages/profile";
 
 export default function App() {
   return (
@@ -31,6 +33,22 @@ export default function App() {
           />
           <Route path="/auth/register" element={<Register />} />
           <Route path="/auth/login" element={<Login />} />
+          <Route
+            path="/auth/verify"
+            element={
+              <ProtectedRoute>
+                <VerifyEmail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </Router>
     </AuthProvider>

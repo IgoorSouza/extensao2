@@ -6,7 +6,7 @@ import com.igorsouza.games.models.Game;
 import com.igorsouza.games.models.User;
 import com.igorsouza.games.services.games.GameService;
 import com.igorsouza.games.services.mail.MailService;
-import com.igorsouza.games.services.users.UsersService;
+import com.igorsouza.games.services.users.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -18,13 +18,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GameDiscountWarningScheduler {
 
-    private final UsersService usersService;
+    private final UserService userService;
     private final GameService gameService;
     private final MailService mailService;
 
     @Scheduled(fixedRate = 86400000, initialDelay = 0, zone = "America/Sao_Paulo")
     public void sendGameDiscountWarningMail() {
-        List<User> users = usersService.getAllUsers();
+        List<User> users = userService.getUsersWithVerifiedEmailAndEnabledNotifications();
 
         for (User user : users) {
             List<Game> userGames = gameService.getGamesByUser(user);

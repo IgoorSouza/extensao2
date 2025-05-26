@@ -6,6 +6,7 @@ import com.igorsouza.games.dtos.auth.NewUser;
 import com.igorsouza.games.exceptions.BadRequestException;
 import com.igorsouza.games.exceptions.ConflictException;
 import com.igorsouza.games.exceptions.NotFoundException;
+import com.igorsouza.games.exceptions.UnauthorizedException;
 import com.igorsouza.games.services.auth.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -32,5 +33,19 @@ public class AuthController {
             throws NotFoundException, BadRequestException {
         LoginResponse authData = authService.login(login);
         return ResponseEntity.ok(authData);
+    }
+
+    @PostMapping("/request-verification")
+    public ResponseEntity<String> requestVerification()
+            throws UnauthorizedException, ConflictException {
+        authService.requestVerification();
+        return ResponseEntity.ok("Verification email successfully sent.");
+    }
+
+    @PostMapping("/verify")
+    public ResponseEntity<String> requestVerification(@RequestParam String token)
+            throws UnauthorizedException, ConflictException {
+        authService.verifyEmail(token);
+        return ResponseEntity.ok("Email successfully verified.");
     }
 }

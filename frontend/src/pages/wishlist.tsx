@@ -31,14 +31,11 @@ export default function Wishlist() {
 
   async function removeGameFromWishlist(game: Game) {
     try {
-      const headers = {
-        Authorization: `Bearer ${authData!.token}`,
-        "Content-Type": "application/json",
-      };
-
       await axios.delete("/wishlist", {
         data: { platformIdentifier: game.identifier, platform: game.platform },
-        headers,
+        headers: {
+          Authorization: `Bearer ${authData!.token}`,
+        },
       });
 
       setGames((prev) =>
@@ -55,21 +52,39 @@ export default function Wishlist() {
   }
 
   return (
-    <div className="flex flex-col gap-y-5 items-center">
+    <div className="flex flex-col gap-y-5 items-center mb-5">
       <h1 className="text-white text-3xl mt-5">Lista de desejos</h1>
 
       {loading ? (
         <p className="text-white text-xl">Carregando jogos...</p>
       ) : (
-        games?.map((game) => (
-          <GameCard
-            game={game}
-            gameStore={game.platform === "STEAM" ? "Steam" : "Epic Games Store"}
-            wishlistButtonText="Remover da lista de desejos"
-            wishlistButtonFunction={() => removeGameFromWishlist(game)}
-            key={game.identifier}
-          />
-        ))
+        <>
+          {games && games.length > 0 ? (
+            <>
+              {!authData?.emailVerified && (
+                <p className="text-white text-md">
+                  Verifique seu email para receber notificações de promoções dos
+                  jogos da sua lista de desejos!
+                </p>
+              )}
+              {games?.map((game) => (
+                <GameCard
+                  game={game}
+                  gameStore={
+                    game.platform === "STEAM" ? "Steam" : "Epic Games Store"
+                  }
+                  wishlistButtonText="Remover da lista de desejos"
+                  wishlistButtonFunction={() => removeGameFromWishlist(game)}
+                  key={game.identifier}
+                />
+              ))}
+            </>
+          ) : (
+            <p className="text-white text-lg">
+              Você ainda não adicionou nenhum jogo à sua lista de desejos.
+            </p>
+          )}
+        </>
       )}
     </div>
   );

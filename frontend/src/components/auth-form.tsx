@@ -37,7 +37,7 @@ export default function AuthForm({
         {children}
 
         <button
-          className={`bg-gray-900 text-white rounded-md py-1 px-5 m-auto text-lg cursor-pointer font-semibold ${
+          className={`bg-gray-900 text-white rounded-md py-1 px-5 m-auto text-lg cursor-pointer transition font-semibold ${
             loading ? "opacity-80" : "cursor-pointer hover:opacity-80"
           }`}
           disabled={loading}

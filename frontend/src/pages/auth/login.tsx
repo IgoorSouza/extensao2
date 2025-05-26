@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AuthForm from "../../components/auth-form";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
 import eye from "../../assets/eye.svg";
 import eyeClosed from "../../assets/eye-closed.svg";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../../hooks/use-auth";
 
 export default function Login() {
@@ -13,6 +13,15 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+
+  useEffect(() => {
+    const expired = params.get("expired");
+
+    if (expired) {
+      toast.error("Sua sessão expirou. Por favor, faça o login novamente.");
+    }
+  }, [params]);
 
   async function handleLogin() {
     try {

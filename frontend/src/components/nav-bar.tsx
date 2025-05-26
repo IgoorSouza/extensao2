@@ -11,6 +11,7 @@ export default function Navbar() {
   const protectedPages = [
     ...pages,
     { path: "/wishlist", label: "Lista de Desejos" },
+    { path: "/profile", label: "Perfil" },
   ];
 
   function handleLogout() {
@@ -23,16 +24,14 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="flex items-center justify-between bg-gray-800 text-white p-4 shadow-md px-16">
-      <ul className="flex gap-5 items-center">
+    <nav className="flex items-center justify-between bg-gradient-to-b from-zinc-900 to-zinc-800 text-white p-4 shadow-md px-16">
+      <ul className="flex gap-8 items-center">
         {(authData ? protectedPages : pages).map((link) => (
           <li key={link.path}>
             <Link
               to={link.path}
-              className={`text-lg hover:text-yellow-400 transition ${
-                location.pathname === link.path
-                  ? "text-yellow-400 font-bold"
-                  : ""
+              className={`text-lg hover:text-zinc-400 transition ${
+                location.pathname === link.path ? "text-zinc-400 font-bold" : ""
               }`}
             >
               {link.label}
@@ -48,7 +47,7 @@ export default function Navbar() {
           <>
             <div className="text-right">
               <p className="text-sm font-semibold">{authData.name}</p>
-              <p className="text-xs text-gray-300">{authData.email}</p>
+              <p className="text-xs">{authData.email}</p>
             </div>
 
             <button

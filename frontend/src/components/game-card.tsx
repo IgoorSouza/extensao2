@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Game } from "../types/game";
 import formatGamePrice from "../utils/format-game-price";
+import ImageFallback from "./image-fallback";
+import fallback from "../assets/fallback.webp";
 
 interface Props {
   game: Game;
@@ -22,37 +24,35 @@ export default function GameCard({
   return (
     <div
       key={game.identifier}
-      className="w-full max-w-md bg-[#1f2937] rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300"
+      className="w-full max-w-md bg-zinc-800 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300"
     >
-      <img
+      <ImageFallback
         src={game.image}
-        alt={game.title}
+        fallback={fallback}
         className="w-full h-48 object-cover"
       />
 
       <div className="p-5 flex flex-col gap-2 text-center">
-        <h2 className="text-white font-semibold text-xl">{game.title}</h2>
+        <h2 className="text-white font-semibold text-xl mb-2">{game.title}</h2>
 
         {game.initialPrice === 0 ? (
           <p className="text-green-400 font-semibold">Gratuito</p>
         ) : (
           <>
             <p className="text-green-400 font-bold">
-              Preço Atual: R$ {gameDiscountPrice}
+              Preço Atual: R${gameDiscountPrice}
             </p>
 
             {game.initialPrice > game.discountPrice && (
               <>
-                <p className="text-gray-400 text-md">
-                  Preço Original:{" "}
-                  <span className="line-through">R$ {gameInitialPrice}</span>
+                <p className="text-md text-white">
+                  Preço Original: <span>R${gameInitialPrice}</span>
+                  {game.discountPercent > 0 && (
+                    <span className="ml-2 bg-zinc-600 px-3 py-1 rounded-full">
+                      {game.discountPercent}% OFF!
+                    </span>
+                  )}
                 </p>
-
-                {game.discountPercent > 0 && (
-                  <span className="bg-yellow-500 text-black text-md font-semibold px-3 py-1 rounded-full mt-1">
-                    {game.discountPercent}% de desconto!
-                  </span>
-                )}
               </>
             )}
           </>
@@ -62,7 +62,7 @@ export default function GameCard({
           href={game.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-2 inline-block text-sm bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-300"
+          className="mt-4 inline-block text-sm bg-white text-black px-4 py-2 rounded-lg transition duration-300 hover:opacity-70"
         >
           Acessar na {gameStore}
         </a>
@@ -75,8 +75,8 @@ export default function GameCard({
               await wishlistButtonFunction(game);
               setLoading(false);
             }}
-            className={`mt-2 inline-block text-sm bg-cyan-500 text-white px-4 py-2 rounded-lg transition duration-300 ${
-              loading ? "bg-cyan-600" : "hover:bg-cyan-600 cursor-pointer"
+            className={`mt-2 inline-block text-sm bg-white text-black px-4 py-2 rounded-lg transition duration-300 ${
+              loading ? "opacity-70" : "hover:opacity-70 cursor-pointer"
             }`}
           >
             {wishlistButtonText}

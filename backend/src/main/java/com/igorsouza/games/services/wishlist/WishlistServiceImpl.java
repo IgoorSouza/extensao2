@@ -10,7 +10,7 @@ import com.igorsouza.games.models.Game;
 import com.igorsouza.games.models.GameId;
 import com.igorsouza.games.models.User;
 import com.igorsouza.games.services.games.GameService;
-import com.igorsouza.games.services.users.UsersService;
+import com.igorsouza.games.services.users.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,12 +20,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WishlistServiceImpl implements WishlistService {
 
-    private final UsersService usersService;
+    private final UserService userService;
     private final GameService gameService;
 
     @Override
     public List<GenericGame> getAuthenticatedUserGames() throws UnauthorizedException {
-        User authenticatedUser = usersService.getAuthenticatedUser();
+        User authenticatedUser = userService.getAuthenticatedUser();
         List<Game> userGames = gameService.getGamesByUser(authenticatedUser);
 
         return userGames.stream().map(game -> {
@@ -50,7 +50,7 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     private Game parseWishlistGameToGame(WishlistGame wishlistGame) throws UnauthorizedException {
-        User authenticatedUser = usersService.getAuthenticatedUser();
+        User authenticatedUser = userService.getAuthenticatedUser();
         GameId gameId = new GameId(
                 authenticatedUser.getId(),
                 wishlistGame.getPlatformIdentifier(),
