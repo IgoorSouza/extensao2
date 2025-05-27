@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Game } from "../types/game";
 import formatGamePrice from "../utils/format-game-price";
-import ImageFallback from "./image-fallback";
-import fallback from "../assets/fallback.webp";
 
 interface Props {
   game: Game;
@@ -26,11 +24,7 @@ export default function GameCard({
       key={game.identifier}
       className="w-full max-w-md bg-zinc-800 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-300"
     >
-      <ImageFallback
-        src={game.image}
-        fallback={fallback}
-        className="w-full h-48 object-cover"
-      />
+      <img src={game.image} className="w-full h-48 object-cover" />
 
       <div className="p-5 flex flex-col gap-2 text-center">
         <h2 className="text-white font-semibold text-xl mb-2">{game.title}</h2>
