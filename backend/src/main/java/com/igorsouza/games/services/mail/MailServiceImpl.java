@@ -3,6 +3,7 @@ package com.igorsouza.games.services.mail;
 import com.igorsouza.games.dtos.games.GenericGame;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,8 +31,6 @@ public class MailServiceImpl implements MailService {
     public void sendDiscountWarningMail(String to, String subject, List<GenericGame> games) throws MailException {
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
             Template template = freemarkerConfig.getTemplate("discount-email.ftl");
 
             Map<String, Object> model = new HashMap<>();
@@ -39,10 +38,7 @@ public class MailServiceImpl implements MailService {
 
             StringWriter html = new StringWriter();
             template.process(model, html);
-
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(html.toString(), true);
+            configureMimeMessageHelper(message, to, subject, html.toString());
 
             mailSender.send(message);
         } catch (Exception e) {
@@ -54,8 +50,6 @@ public class MailServiceImpl implements MailService {
     public void sendVerificationMail(String to, String subject, String token) throws MailException {
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
             Template template = freemarkerConfig.getTemplate("verification-email.ftl");
 
             Map<String, Object> model = new HashMap<>();
@@ -64,14 +58,18 @@ public class MailServiceImpl implements MailService {
 
             StringWriter html = new StringWriter();
             template.process(model, html);
-
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(html.toString(), true);
+            configureMimeMessageHelper(message, to, subject, html.toString());
 
             mailSender.send(message);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void configureMimeMessageHelper(MimeMessage message, String to, String subject, String html) throws MessagingException {
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(message, true, "UTF-8");
+        mimeMessageHelper.setTo(to);
+        mimeMessageHelper.setSubject(subject);
+        mimeMessageHelper.setText(html, true);
     }
 }

@@ -25,19 +25,19 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> userNotFoundException(NotFoundException e) {
+    public ResponseEntity<String> notFoundException(NotFoundException e) {
         return ResponseEntity.status(e.getStatus())
                 .body(e.getMessage());
     }
 
     @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<String> userNotFoundException(ConflictException e) {
+    public ResponseEntity<String> conflictException(ConflictException e) {
         return ResponseEntity.status(e.getStatus())
                 .body(e.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> userNotFoundException(Exception e) {
+    public ResponseEntity<String> internalServerException(Exception e) {
         e.printStackTrace();
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Ocorreu um erro inesperado. Por favor, tente novamente mais tarde.");

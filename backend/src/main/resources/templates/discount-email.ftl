@@ -1,5 +1,5 @@
-    <!DOCTYPE html>
-    <html>
+<!DOCTYPE html>
+<html lang="pt-BR">
     <head>
         <meta charset="UTF-8">
         <title>Jogos com Desconto!</title>
@@ -35,43 +35,42 @@
         </style>
     </head>
     <body>
-    <h2>🎮 Jogos com Desconto!</h2>
-    <p>Confira os jogos em promoção abaixo:</p>
+        <h2>🎮 Jogos com Desconto!</h2>
+        <p>Confira os jogos em promoção abaixo:</p>
 
-    <table class="game-list">
-        <thead>
-        <tr>
-            <th>Imagem</th>
-            <th>Título</th>
-            <th>Preço Original</th>
-            <th>Preço com Desconto</th>
-            <th>Desconto (%)</th>
-            <th>Plataforma</th>
-        </tr>
-        </thead>
-        <tbody>
-        <#list games as game>
+        <table class="game-list">
+            <thead>
             <tr>
-                <td><img src="${game.image}" alt="${game.title}" class="game-image"/></td>
-                <td><a href="${game.url}" target="_blank">${game.title}</a></td>
-                <td>R$ ${game.initialPrice?string["0.00"]}</td>
-                <td class="discount">R$ ${game.discountPrice?string["0.00"]}</td>
-                <td>${game.discountPercent}%</td>
-                <td>
-                    <#if game.platform == "STEAM">
-                        Steam
-                    <#else>
-                        Epic Games Store
-                    </#if>
-                </td>
+                <th>Imagem</th>
+                <th>Título</th>
+                <th>Preço Original</th>
+                <th>Preço com Desconto</th>
+                <th>Desconto (%)</th>
+                <th>Plataforma</th>
             </tr>
-        </#list>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            <#list games as game>
+                <tr>
+                    <td><img src="${game.image}" alt="${game.title}" class="game-image"/></td>
+                    <td><a href="${game.url}" target="_blank">${game.title}</a></td>
+                    <td>R$ ${game.initialPrice?string["0.00"]}</td>
+                    <td class="discount">R$ ${game.discountPrice?string["0.00"]}</td>
+                    <td>${game.discountPercent}%</td>
+                    <td>
+                        <#if game.platform == "STEAM">
+                            Steam
+                        <#else>
+                            Epic Games Store
+                        </#if>
+                    </td>
+                </tr>
+            </#list>
+            </tbody>
+        </table>
 
-    <p style="font-size: 0.9em; color: #888; margin-top: 40px;">
-        ⚠️ Nota: Alguns links para jogos da <strong>Epic Games Store</strong> podem não funcionar corretamente.
-    </p>
-
+        <p style="font-size: 0.9em; color: #888; margin-top: 40px;">
+            ⚠️ Nota: Alguns links para jogos da <strong>Epic Games Store</strong> podem não funcionar corretamente.
+        </p>
     </body>
-    </html>
+</html>
