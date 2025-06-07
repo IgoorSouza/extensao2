@@ -11,7 +11,7 @@ export default function Login() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const navigate = useNavigate();
   const [params] = useSearchParams();
 
@@ -19,6 +19,7 @@ export default function Login() {
     const expired = params.get("expired");
 
     if (expired) {
+      logout();
       toast.error("Sua sessão expirou. Por favor, faça o login novamente.");
     }
   }, [params]);
@@ -35,7 +36,10 @@ export default function Login() {
           return;
         }
 
-        if (error.status === 401) {
+        if (
+          error.status === 400 &&
+          error.response?.data === "Wrong password."
+        ) {
           toast.error("Senha incorreta.");
           return;
         }
