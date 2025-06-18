@@ -1,6 +1,8 @@
 package com.igorsouza.games.controllers;
 
+import com.igorsouza.games.dtos.users.ChangePassword;
 import com.igorsouza.games.dtos.users.UpdateUser;
+import com.igorsouza.games.exceptions.BadRequestException;
 import com.igorsouza.games.exceptions.ConflictException;
 import com.igorsouza.games.exceptions.UnauthorizedException;
 import com.igorsouza.games.services.users.UserService;
@@ -26,6 +28,13 @@ public class UserController {
     public ResponseEntity<String> toggleNotifications() throws UnauthorizedException {
         boolean notificationsEnabled = userService.toggleNotifications();
         return ResponseEntity.ok("Notifications successfully " + (notificationsEnabled ? "enabled" : "disabled") + ".");
+    }
+
+    @PutMapping("/change-password")
+    public ResponseEntity<String> changePassword(@RequestBody ChangePassword passwords)
+            throws BadRequestException, UnauthorizedException {
+        userService.changeUserPassword(passwords);
+        return ResponseEntity.ok("Password successfully changed.");
     }
 
     @DeleteMapping

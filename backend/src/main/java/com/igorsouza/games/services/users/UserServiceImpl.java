@@ -1,7 +1,9 @@
 package com.igorsouza.games.services.users;
 
 import com.igorsouza.games.dtos.auth.NewUser;
+import com.igorsouza.games.dtos.users.ChangePassword;
 import com.igorsouza.games.dtos.users.UpdateUser;
+import com.igorsouza.games.exceptions.BadRequestException;
 import com.igorsouza.games.exceptions.ConflictException;
 import com.igorsouza.games.exceptions.UnauthorizedException;
 import com.igorsouza.games.models.User;
@@ -102,6 +104,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userRepository.save(user);
 
         return user.isNotificationsEnabled();
+    }
+
+    @Override
+    public void changeUserPassword(ChangePassword passwords) throws BadRequestException, UnauthorizedException {
+        User user = getAuthenticatedUser();
+
+        if (!passwordEncoder.matches(passwords.getCurrentPassword(), user.getPassword())) {
+            throw new UnauthorizedException("Current password is incorrect.");
+        }
+
+        if (passwords.getCurrentPassword().equals(passwords.getNewPassword())) {
+            throw new BadRequestException("The new password cannot be the same as the current password.");
+        }
+
+        user.setPassword(passwordEncoder.encode(passwords.getNewPassword()));
+        userRepository.save(user);
     }
 
     @Override

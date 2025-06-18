@@ -3,20 +3,28 @@ import axios from "../lib/axios";
 import { useAuth } from "../hooks/use-auth";
 import toast from "react-hot-toast";
 import { AxiosError } from "axios";
+import eye from "../assets/eye.svg";
+import eyeClosed from "../assets/eye-closed.svg";
 
 export default function Profile() {
   const { authData, logout, updateAuthData } = useAuth();
   const [name, setName] = useState<string>(authData!.name);
   const [email, setEmail] = useState<string>(authData!.email);
+  const [currentPassword, setCurrentPassword] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
   const [notificationsEnabled, setNotificationsEnabled] = useState<boolean>(
     authData!.notificationsEnabled
   );
   const [loading, setLoading] = useState<boolean>(false);
+  const [showCurrentPassword, setShowCurrentPassword] =
+    useState<boolean>(false);
+  const [showNewPassword, setShowNewPassword] = useState<boolean>(false);
   const [showDeleteAccountConfirmation, setShowDeleteAccountConfirmation] =
     useState<boolean>(false);
 
-  async function updateProfile() {
+  async function updateProfile(event: React.FormEvent<HTMLFormElement>) {
     try {
+      event.preventDefault();
       setLoading(true);
 
       await axios.put(
@@ -37,6 +45,38 @@ export default function Profile() {
       if (error instanceof AxiosError && error.status === 409) {
         toast.error(`O email ${email} já está em uso.`);
         return;
+      }
+
+      console.error(error);
+      toast.error("Ocorreu um erro ao atualizar seus dados.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function changePassword(event: React.FormEvent<HTMLFormElement>) {
+    try {
+      event.preventDefault();
+      setLoading(true);
+
+      await axios.put(
+        "/user/change-password",
+        { currentPassword, newPassword },
+        { headers: { Authorization: `Bearer ${authData!.token}` } }
+      );
+
+      toast.success("Senha alterada com sucesso!");
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.status === 401) {
+          toast.error("A senha atual está incorreta.");
+          return;
+        }
+
+        if (error.status === 400) {
+          toast.error("A nova senha não pode ser igual à senha atual.");
+          return;
+        }
       }
 
       console.error(error);
@@ -129,7 +169,7 @@ export default function Profile() {
 
   return (
     <>
-      <div className="text-white max-w-xl mx-auto mt-10 p-5 bg-zinc-800 rounded-2xl shadow-xl">
+      <div className="text-white max-w-xl mx-auto my-10 p-5 bg-zinc-800 rounded-2xl shadow-xl">
         <h1 className="text-2xl font-semibold mb-2 text-center">Perfil</h1>
 
         <form onSubmit={updateProfile} className="flex flex-col gap-4">
@@ -140,6 +180,7 @@ export default function Profile() {
             <input
               id="name"
               value={name}
+              required
               onChange={(e) => setName(e.target.value)}
               className="w-full p-2 rounded-md border bg-white text-black"
             />
@@ -151,21 +192,82 @@ export default function Profile() {
             </label>
             <input
               id="email"
+              type="email"
               value={email}
+              required
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-2 rounded-md border bg-white text-black"
             />
           </div>
 
           <button
-            type="button"
+            type="submit"
             disabled={loading}
-            onClick={updateProfile}
             className={`px-4 py-2 bg-white text-black rounded-md w-1/3 mx-auto mt-2 ${
               loading ? "opacity-70" : "cursor-pointer hover:opacity-70"
             }`}
           >
             Salvar alterações
+          </button>
+        </form>
+
+        <form onSubmit={changePassword} className="flex flex-col gap-4 mt-4">
+          <div>
+            <label htmlFor="currentPassword" className="block mb-1">
+              Senha atual
+            </label>
+            <div className="flex items-center justify-between border-1 border-black rounded-md">
+              <input
+                type={showCurrentPassword ? "text" : "password"}
+                id="currentPassword"
+                required
+                min={6}
+                className="w-full p-2 rounded-l-md border bg-white text-black"
+                onChange={(event) => setCurrentPassword(event.target.value)}
+              />
+              <img
+                src={showCurrentPassword ? eyeClosed : eye}
+                className="bg-gray-300 rounded-r-md p-2 cursor-pointer"
+                onClick={() =>
+                  setShowCurrentPassword(
+                    (showCurrentPassword) => !showCurrentPassword
+                  )
+                }
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="newPassword" className="block mb-1">
+              Nova senha
+            </label>
+            <div className="flex items-center justify-between border-1 border-black rounded-md">
+              <input
+                type={showNewPassword ? "text" : "password"}
+                id="newPassword"
+                required
+                min={6}
+                className="w-full p-2 rounded-l-md border bg-white text-black"
+                onChange={(event) => setNewPassword(event.target.value)}
+              />
+              <img
+                src={showNewPassword ? eyeClosed : eye}
+                className="bg-gray-300 rounded-r-md p-2 cursor-pointer"
+                onClick={() =>
+                  setShowNewPassword((showNewPassword) => !showNewPassword)
+                }
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            disabled={loading}
+            className={`px-4 py-2 bg-white text-black rounded-md w-1/3 mx-auto mt-2 ${
+              loading ? "opacity-70" : "cursor-pointer hover:opacity-70"
+            }`}
+          >
+            Mudar senha
           </button>
         </form>
 
